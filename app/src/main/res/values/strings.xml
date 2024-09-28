@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">AppContatos</string>
+    <string name="contacts">Contatos</string>
+    <string name="loading_contacts">Carregando seus contatos...</string>
+    <string name="loading_error">Erro ao carregar</string>
+    <string name="wait_and_try_again">Aguarde um momento e tente novamente</string>
+    <string name="try_again">Tente novamente</string>
+    <string name="nothing_here">Nada por aqui</string>
+    <string name="refresh">Atualizar</string>
+</resources>
