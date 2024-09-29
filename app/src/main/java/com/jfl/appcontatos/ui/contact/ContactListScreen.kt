@@ -52,6 +52,7 @@ import androidx.compose.ui.unit.dp
 import com.jfl.appcontatos.R
 import com.jfl.appcontatos.data.Contact
 import com.jfl.appcontatos.ui.theme.AppContatosTheme
+import com.jfl.appcontatos.ui.utils.compasables.ContactAvatar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -320,7 +321,9 @@ fun ContactItem(
     ListItem(
         modifier = modifier,
         headlineContent = { Text(contact.fullName) },
-        leadingContent = {},
+        leadingContent = {
+            ContactAvatar(firstName = contact.firstName , lastName = contact.lastName)
+        },
         trailingContent = {
             IconButton(onClick = {onFavoritePressed(contact)}) {
                 Icon(
