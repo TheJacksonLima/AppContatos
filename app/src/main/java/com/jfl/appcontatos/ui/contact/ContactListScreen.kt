@@ -1,9 +1,7 @@
 package com.jfl.appcontatos.ui.contact
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.SurfaceCoroutineScope
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,13 +10,10 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CloudOff
@@ -39,11 +34,12 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -68,37 +64,37 @@ fun ContactListScreen(
     modifier: Modifier = Modifier,
     coroutineScope: CoroutineScope = rememberCoroutineScope()
 ) {
-   val isInitialComposition: MutableState<Boolean> = rememberSaveable { mutableStateOf(true) }
-   val isLoading: MutableState<Boolean> = rememberSaveable { mutableStateOf(false) }
-   val hasError: MutableState<Boolean> = rememberSaveable { mutableStateOf(false) }
-   val contacts: MutableState<Map<String, List<Contact>>> = remember{ mutableStateOf(mapOf()) }
+   var isInitialComposition: Boolean by rememberSaveable { mutableStateOf(true) }
+   var isLoading: Boolean by rememberSaveable { mutableStateOf(false) }
+   var hasError:  Boolean by rememberSaveable { mutableStateOf(false) }
+   var contacts: Map<String, List<Contact>> by remember{ mutableStateOf(mapOf()) }
 
    val loadContacts: () -> Unit = {
-       isLoading.value = true
-       hasError.value = false
+       isLoading = true
+       hasError = false
 
        coroutineScope.launch{
            delay(2000)
-           contacts.value = ContactDataSource.instance.findAll().groupByInitial()
-           isLoading.value = false
+           contacts  = ContactDataSource.instance.findAll().groupByInitial()
+           isLoading = false
        }
    }
 
     val toggleFavorite: (Contact) -> Unit = { contact->
         val updatedContact = contact.copy(isFavorite = !contact.isFavorite)
         ContactDataSource.instance.save(updatedContact)
-        contacts.value = ContactDataSource.instance.findAll().groupByInitial()
+        contacts= ContactDataSource.instance.findAll().groupByInitial()
     }
 
-    if (isInitialComposition.value){
+    if (isInitialComposition){
        loadContacts()
-       isInitialComposition.value = false
+       isInitialComposition= false
     }
 
     val contentModifier = modifier.fillMaxSize()
-    if(isLoading.value)
+    if(isLoading)
         LoadingContent(modifier = contentModifier)
-    else if(hasError.value)
+    else if(hasError)
         ErrorContent(modifier = contentModifier, onTryAgainPressed = loadContacts)
     else
     {
@@ -119,11 +115,11 @@ fun ContactListScreen(
             }
         ){ paddingValues ->
             val defaultModifier = Modifier.padding(paddingValues)
-            if(contacts.value.isEmpty()){
+            if(contacts.isEmpty()){
                 EmptyList(modifier = defaultModifier)
             }
             else{
-                List(modifier = defaultModifier, contacts = contacts.value, onFavoritePressed = toggleFavorite)
+                List(modifier = defaultModifier, contacts = contacts, onFavoritePressed = toggleFavorite)
             }
         }
     }
