@@ -78,41 +78,56 @@ fun ContactListScreen(
        }
    }
 
-   if (isInitialComposition.value){
+    val toggleFavorite: (Contact) -> Unit = { contact->
+       contacts.value = contacts.value.map {
+           if (it.id == contact.id)
+               it.copy(isFavorite = !it.isFavorite)
+           else
+               it
+       }
+    }
+
+    if (isInitialComposition.value){
        loadContacts()
        isInitialComposition.value = false
-   }
+    }
 
-   Scaffold(
-       modifier = modifier.fillMaxSize(),
-       topBar = { AppBar(
-           onRefreshPressed = loadContacts
-       )},
-       floatingActionButton = {
-           ExtendedFloatingActionButton(onClick = {
-               contacts.value = contacts.value.plus(
-                   Contact(firstName="Teste", lastName = "Testenildo")
-               )
-           }) {
-               Icon(
-                   imageVector = Icons.Filled.Add,
-                   contentDescription = "Adicionar"
-               )
-               Spacer(Modifier.size(8.dp))
-               Text("Novo Contato")
-           }
-       }
-   ){ paddingValues ->
-       val defaultModifier = Modifier.padding(paddingValues)
-       if(isLoading.value)
-           LoadingContent(modifier = defaultModifier)
-       else if(hasError.value)
-           ErrorContent(modifier = defaultModifier, onTryAgainPressed = loadContacts)
-       else if(contacts.value.isEmpty())
-           EmptyList(modifier = defaultModifier)
-       else
-           List(modifier = defaultModifier, contacts = contacts.value)
-   }
+    val contentModifier = modifier.fillMaxSize()
+    if(isLoading.value)
+        LoadingContent(modifier = contentModifier)
+    else if(hasError.value)
+        ErrorContent(modifier = contentModifier, onTryAgainPressed = loadContacts)
+    else
+    {
+        Scaffold(
+            modifier = modifier.fillMaxSize(),
+            topBar = { AppBar(
+                onRefreshPressed = loadContacts
+            )},
+            floatingActionButton = {
+                ExtendedFloatingActionButton(onClick = {
+                    contacts.value = contacts.value.plus(
+                        Contact(firstName="Teste", lastName = "Testenildo")
+                    )
+                }) {
+                    Icon(
+                        imageVector = Icons.Filled.Add,
+                        contentDescription = "Adicionar"
+                    )
+                    Spacer(Modifier.size(8.dp))
+                    Text("Novo Contato")
+                }
+            }
+        ){ paddingValues ->
+            val defaultModifier = Modifier.padding(paddingValues)
+            if(contacts.value.isEmpty()){
+                EmptyList(modifier = defaultModifier)
+            }
+            else{
+                List(modifier = defaultModifier, contacts = contacts.value, onFavoritePressed = toggleFavorite)
+            }
+        }
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -283,7 +298,8 @@ fun EmptyListPreview(modifier: Modifier = Modifier) {
 @Composable
 fun List(
     modifier: Modifier = Modifier,
-    contacts: List<Contact>
+    contacts: List<Contact>,
+    onFavoritePressed: (Contact) -> Unit
 ) {
     LazyColumn(
         modifier = modifier
@@ -291,38 +307,35 @@ fun List(
             .height(500.dp)
     ){
         //contacts.forEach{ contact -> ContactItem(contact = contact)} -- nao usa com LazyColumn
-        items(contacts){ contact -> ContactItem(contact = contact)}
+        items(contacts){ contact -> ContactItem(contact = contact, onFavoritePressed = onFavoritePressed)}
     }
-
 }
 
 @Composable
 fun ContactItem(
     modifier: Modifier = Modifier,
-    contact: Contact
+    contact: Contact,
+    onFavoritePressed: (Contact) -> Unit
 ) {
-    val isFavorite: MutableState<Boolean> = rememberSaveable { mutableStateOf(contact.isFavorite) }
-
     ListItem(
         modifier = modifier,
         headlineContent = { Text(contact.fullName) },
         leadingContent = {},
         trailingContent = {
-            IconButton(onClick = { isFavorite.value = !isFavorite.value}) {
+            IconButton(onClick = {onFavoritePressed(contact)}) {
                 Icon(
-                    imageVector = if (isFavorite.value) {
+                    imageVector = if (contact.isFavorite) {
                         Icons.Filled.Favorite
                     } else {
                         Icons.Filled.FavoriteBorder
                     },
-                    contentDescription = "Favoritar",
-                    tint = if (isFavorite.value) {
+                    contentDescription = stringResource(R.string.favorite),
+                    tint = if (contact.isFavorite) {
                         Color.Red
                     } else {
                         LocalContentColor.current
                     }
                 )
-
             }
         }
     )
@@ -333,7 +346,8 @@ fun ContactItem(
 fun ListPreview(modifier: Modifier = Modifier) {
     AppContatosTheme {
         List(
-            contacts = generateContacts()
+            contacts = generateContacts(),
+            onFavoritePressed = {}
         )
     }
 }
