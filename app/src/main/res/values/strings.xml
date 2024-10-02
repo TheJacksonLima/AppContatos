@@ -8,4 +8,17 @@
     <string name="nothing_here">Nada por aqui</string>
     <string name="refresh">Atualizar</string>
     <string name="favorite">Favoritar</string>
+    <string name="fail_to_load">Erro ao carregar</string>
+    <string name="empty_list">Você ainda não adicionou nenhum contato.\n Adicione o primeiro utilizando o botão: \"Novo contato\"", </string>
+    <string name="back">Voltar</string>
+    <string name="edit">Editar</string>
+    <string name="my_favorite">Favoritar</string>
+    <string name="delete">Deletar</string>
+    <string name="call">Ligar</string>
+    <string name="mensagem">Mensagem</string>
+    <string name="video">Video</string>
+    <string name="contact_info">Informações de contato</string>
+    <string name="add_fone_number">Adicionar número de telefone</string>
+    <string name="add_email">Adicionar email</string>
+    <string name="add_in">Adicionado em %1$s</string>
 </resources>

@@ -13,7 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.jfl.appcontatos.ui.theme.AppContatosTheme
-import com.jfl.appcontatos.ui.contact.ContactListScreen
+import com.jfl.appcontatos.ui.contact.list.ContactListScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
